@@ -1,0 +1,10 @@
+{
+  "name": "ledger",
+  "version": "6.0.0",
+  "description": "A load-aware to-do list. Zero runtime dependencies, zero build step.",
+  "scripts": {
+    "test": "node tests/run.js",
+    "start": "npx --yes http-server -c-1 ."
+  },
+  "license": "MIT"
+}

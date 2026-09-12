@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Daybook — a to-do list that keeps its word</title>
+<meta name="description" content="Daybook: a persistent, ink-styled to-do list with undo, drag-to-reorder, streaks, an editable activity chart, and keyboard shortcuts." />
+<meta name="theme-color" content="#F4F4F1" />
+
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23141F1B'/%3E%3Cpath d='M50 22c-10-5.5-24-5.5-35.5-1.5V78c11.5-4 25.5-4 35.5 1.5' stroke='%23E7A33E' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M50 22c10-5.5 24-5.5 35.5-1.5V78c-11.5-4-25.5-4-35.5 1.5' stroke='%23E7A33E' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M50 22V79.5' stroke='%23E7A33E' stroke-width='5.5' stroke-linecap='round'/%3E%3Cpath d='M62 44l7 7 14-15' stroke='%23E7A33E' stroke-width='6' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23141F1B'/%3E%3Cpath d='M50 22c-10-5.5-24-5.5-35.5-1.5V78c11.5-4 25.5-4 35.5 1.5' stroke='%23E7A33E' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M50 22c10-5.5 24-5.5 35.5-1.5V78c-11.5-4-25.5-4-35.5 1.5' stroke='%23E7A33E' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M50 22V79.5' stroke='%23E7A33E' stroke-width='5.5' stroke-linecap='round'/%3E%3Cpath d='M62 44l7 7 14-15' stroke='%23E7A33E' stroke-width='6' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="css/tokens.css" />
+<link rel="stylesheet" href="css/base.css" />
+<link rel="stylesheet" href="css/layout.css" />
+<link rel="stylesheet" href="css/components.css" />
+<link rel="stylesheet" href="css/animations.css" />
+<link rel="stylesheet" href="css/elevate.css" />
+<link rel="stylesheet" href="css/sidebar.css" />
+<link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+
+<a class="skip-link" href="#main-content">Skip to task list</a>
+
+<div class="app-shell">
+
+  <!-- ===================== SIDEBAR (desktop only) ===================== -->
+  <aside class="sidebar" id="app-sidebar" aria-label="Primary navigation">
+    <div class="sidebar-inner">
+
+      <div class="sidebar-brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M12 5.3c-2.4-1.3-5.7-1.3-8.5-.4V17c2.8-1 6.1-1 8.5.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 5.3c2.4-1.3 5.7-1.3 8.5-.4V17c-2.8-1-6.1-1-8.5.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 5.3v12.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M14.8 10.4l1.7 1.7 3.4-3.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <div class="sidebar-brand-text">
+          <span class="sidebar-brand-name">Daybook</span>
+          <time id="sb-today-date" class="mono sidebar-brand-date"></time>
+        </div>
+      </div>
+
+      <button type="button" class="sidebar-quickadd" id="sb-quickadd-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 5 V19 M5 12 H19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        Add task
+      </button>
+
+      <div class="sidebar-today-card">
+        <div class="sidebar-progress-ring">
+          <svg width="34" height="34" viewBox="0 0 30 30">
+            <circle class="track" cx="15" cy="15" r="12"></circle>
+            <circle class="fill" id="sb-progress-circle" cx="15" cy="15" r="12" stroke-dasharray="75.4" stroke-dashoffset="75.4"></circle>
+          </svg>
+          <span class="progress-ring__label mono" id="sb-progress-label">0%</span>
+        </div>
+        <div class="sidebar-today-figures">
+          <span class="sidebar-today-headline">Today's progress</span>
+          <span class="mono sidebar-today-sub"><span id="sb-streak-count">0</span> day streak</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav-group" aria-label="Switch view">
+        <p class="sidebar-nav-label">Views</p>
+        <button type="button" class="sidebar-nav-item view-switch-btn" data-view="list">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          List
+        </button>
+        <button type="button" class="sidebar-nav-item view-switch-btn" data-view="board">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="5.5" height="16" rx="1.2" stroke="currentColor" stroke-width="1.8"/><rect x="9.5" y="4" width="5.5" height="10" rx="1.2" stroke="currentColor" stroke-width="1.8"/><rect x="16" y="4" width="5.5" height="13" rx="1.2" stroke="currentColor" stroke-width="1.8"/></svg>
+          Board
+        </button>
+      </nav>
+
+      <nav class="sidebar-nav-group" aria-label="Filter tasks">
+        <p class="sidebar-nav-label">Show</p>
+        <button type="button" class="sidebar-nav-item filter-btn" data-filter="all">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.7"/></svg>
+          All tasks
+        </button>
+        <button type="button" class="sidebar-nav-item filter-btn" data-filter="active">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.7"/></svg>
+          Active
+        </button>
+        <button type="button" class="sidebar-nav-item filter-btn" data-filter="completed">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Completed
+        </button>
+      </nav>
+
+      <nav class="sidebar-nav-group sidebar-tags-group" id="sidebar-tags-group" aria-label="Filter by tag">
+        <p class="sidebar-nav-label">Tags</p>
+        <div id="sidebar-tag-filters" class="sidebar-tag-list"></div>
+      </nav>
+
+      <div class="sidebar-spacer"></div>
+
+      <nav class="sidebar-nav-group sidebar-tools-group" aria-label="Tools">
+        <button type="button" class="sidebar-nav-item" id="sb-focus-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.4" opacity="0.55"/></svg>
+          Focus mode
+          <kbd class="sidebar-nav-kbd">F</kbd>
+        </button>
+        <button type="button" class="sidebar-nav-item" id="sb-statement-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M6 3h9l4 4v14H6z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M15 3v4h4" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.5 17v-3M12 17v-6M15.5 17v-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          Statement
+          <kbd class="sidebar-nav-kbd">S</kbd>
+        </button>
+        <button type="button" class="sidebar-nav-item" id="sb-palette-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M7 9.5l2 2.2-2 2.2M11.5 14h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Command palette
+          <kbd class="sidebar-nav-kbd">⌘K</kbd>
+        </button>
+        <button type="button" class="sidebar-nav-item" id="sb-shortcuts-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4.5M12 17.5v.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.6"/></svg>
+          Shortcuts
+          <kbd class="sidebar-nav-kbd">?</kbd>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button type="button" class="sidebar-nav-item" id="sb-export-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 3v12M7 10l5 5 5-5M5 21h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Export backup
+        </button>
+        <label class="sidebar-nav-item" for="sb-import-file">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 21V9M7 14l5-5 5 5M5 3h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Import backup
+        </label>
+        <input id="sb-import-file" type="file" accept="application/json" class="sr-only" />
+
+        <button id="sb-theme-toggle" class="theme-toggle sidebar-theme-toggle" type="button" aria-label="Toggle theme">
+          <span class="toggle-track">
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <svg class="icon-moon" viewBox="0 0 24 24" fill="none"><path d="M20 14.5A8 8 0 119.5 4a6.5 6.5 0 0010.5 10.5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            <span class="toggle-dot"></span>
+          </span>
+          <span class="sidebar-theme-label">Ledger / Paper</span>
+        </button>
+      </div>
+
+    </div>
+  </aside>
+
+  <div class="main-content">
+<div class="page">
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="app-header" id="app-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
+          <path d="M12 5.3c-2.4-1.3-5.7-1.3-8.5-.4V17c2.8-1 6.1-1 8.5.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 5.3c2.4-1.3 5.7-1.3 8.5-.4V17c-2.8-1-6.1-1-8.5.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 5.3v12.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M14.8 10.4l1.7 1.7 3.4-3.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <h1>Daybook</h1>
+      <time id="today-date" class="mono header-date"></time>
+    </div>
+
+    <div class="header-stats">
+      <div class="stat-block stat-streak" title="Consecutive days with at least one entry completed">
+        <span class="stat-icon" aria-hidden="true">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2C12 2 6 9 6 14a6 6 0 0012 0c0-2-1-3-1-3s-1 2-2 2c1-3-1-6-3-11z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        </span>
+        <span id="streak-count" class="mono">0</span>
+        <span>day streak</span>
+      </div>
+
+      <div class="progress-ring" title="Today's progress" role="img" aria-label="Today's completion progress">
+        <svg width="30" height="30" viewBox="0 0 30 30">
+          <circle class="track" cx="15" cy="15" r="12"></circle>
+          <circle class="fill" id="progress-circle" cx="15" cy="15" r="12" stroke-dasharray="75.4" stroke-dashoffset="75.4"></circle>
+        </svg>
+        <span class="progress-ring__label mono" id="progress-label">0%</span>
+      </div>
+
+      <div class="header-actions">
+        <button id="focus-btn" class="icon-btn" type="button" aria-label="Enter Focus Mode" title="Focus Mode (F)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.4" opacity="0.55"/></svg>
+        </button>
+
+        <button id="statement-btn" class="icon-btn" type="button" aria-label="Open activity statement" title="Statement (S)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M6 3h9l4 4v14H6z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M15 3v4h4" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.5 17v-3M12 17v-6M15.5 17v-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+
+        <button id="palette-btn" class="icon-btn" type="button" aria-label="Open command palette" title="Command palette (⌘K)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M7 9.5l2 2.2-2 2.2M11.5 14h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+
+        <button id="shortcuts-btn" class="icon-btn" type="button" aria-label="Show keyboard shortcuts" title="Keyboard shortcuts (?)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4.5M12 17.5v.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.6"/></svg>
+        </button>
+
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to paper mode" aria-pressed="false">
+          <span class="toggle-track">
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <svg class="icon-moon" viewBox="0 0 24 24" fill="none"><path d="M20 14.5A8 8 0 119.5 4a6.5 6.5 0 0010.5 10.5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            <span class="toggle-dot"></span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== TOOLBAR: search + overdue ===================== -->
+  <div class="toolbar-row">
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <input id="search-input" class="search-input" type="text" placeholder="Search tasks or #tags…" autocomplete="off" aria-label="Search tasks" />
+      <kbd class="entry-kbd-hint search-kbd-hint" title="Focus search">/</kbd>
+    </div>
+    <span id="overdue-badge" class="overdue-badge" title="Overdue tasks">0 overdue</span>
+    <button id="export-btn" class="icon-btn" type="button" aria-label="Export backup" title="Export backup (JSON)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3v12M7 10l5 5 5-5M5 21h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <label class="icon-btn" for="import-file" aria-label="Import backup" title="Import backup (JSON)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 21V9M7 14l5-5 5 5M5 3h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </label>
+    <input id="import-file" type="file" accept="application/json" class="sr-only" />
+  </div>
+
+  <div id="tag-filters" class="tag-filters" aria-label="Filter by tag"></div>
+
+  <!-- ===================== VIEW SWITCHER ===================== -->
+  <div class="view-switch" role="tablist" aria-label="Switch view">
+    <span id="view-switch-indicator" class="view-switch__indicator" aria-hidden="true"></span>
+    <button class="view-switch-btn active" data-view="list" role="tab" aria-selected="true" type="button">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      List
+    </button>
+    <button class="view-switch-btn" data-view="board" role="tab" aria-selected="false" type="button">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="5.5" height="16" rx="1.2" stroke="currentColor" stroke-width="1.8"/><rect x="9.5" y="4" width="5.5" height="10" rx="1.2" stroke="currentColor" stroke-width="1.8"/><rect x="16" y="4" width="5.5" height="13" rx="1.2" stroke="currentColor" stroke-width="1.8"/></svg>
+      Board
+    </button>
+  </div>
+
+  <!-- ===================== LOAD BAR ===================== -->
+  <div class="load-row" title="How full today's plan is, weighted by task effort">
+    <span class="load-track">
+      <span id="load-fill" class="load-fill" style="width:0%"></span>
+    </span>
+    <span id="load-label" class="mono load-label">0 / 8 load</span>
+    <span id="load-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" class="sr-only"></span>
+  </div>
+
+  <!-- ===================== LEDGER CARD ===================== -->
+  <main class="ledger-card" id="main-content" aria-label="To-do list" tabindex="-1">
+    <div class="ledger-card__inner">
+
+      <form id="add-form" class="entry-line" novalidate>
+        <span class="entry-index mono" id="next-index" aria-hidden="true">01</span>
+        <div class="entry-input-wrap">
+          <input
+            id="task-input"
+            class="entry-input"
+            type="text"
+            placeholder="What needs doing?"
+            autocomplete="off"
+            maxlength="140"
+            aria-label="New task"
+          />
+          <kbd class="entry-kbd-hint" title="! effort · @date · #tag · *daily/*weekly · ^1-4 priority">N</kbd>
+        </div>
+        <button type="submit" class="add-btn" aria-label="Add task">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M12 5 V19 M5 12 H19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </form>
+
+      <p id="input-error" class="input-error" role="alert" aria-live="polite"></p>
+
+      <ul id="task-list" class="task-list" aria-live="polite"></ul>
+
+      <div id="empty-state" class="empty-state">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 20 L16 8 M16 8 L12 8 M16 8 L16 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p class="empty-title" id="empty-title">Nothing logged yet.</p>
+        <p class="empty-sub" id="empty-sub">What's first?</p>
+      </div>
+
+      <footer class="ledger-footer">
+        <span id="count-label" class="mono count-label">0 tasks</span>
+
+        <div class="filters" role="tablist" aria-label="Filter tasks">
+          <button class="filter-btn active" data-filter="all" role="tab" aria-selected="true">All</button>
+          <button class="filter-btn" data-filter="active" role="tab" aria-selected="false">Active</button>
+          <button class="filter-btn" data-filter="completed" role="tab" aria-selected="false">Done</button>
+        </div>
+
+        <button id="select-mode-btn" class="clear-btn" type="button" aria-pressed="false" title="Select multiple (X)">Select</button>
+        <button id="clear-completed" class="clear-btn" type="button">Clear done</button>
+      </footer>
+
+    </div>
+  </main>
+
+  <!-- ===================== BULK SELECTION BAR ===================== -->
+  <div id="selection-bar" class="selection-bar" role="toolbar" aria-label="Bulk actions">
+    <span id="selection-count" class="selection-count mono">0 selected</span>
+    <div class="selection-bar__actions">
+      <button id="selection-complete" class="selection-btn selection-btn--primary" type="button">Complete</button>
+      <button id="selection-delete" class="selection-btn selection-btn--danger" type="button">Delete</button>
+      <button id="selection-cancel" class="selection-btn" type="button">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ===================== BOARD VIEW ===================== -->
+  <div id="board-view" class="board-view" aria-label="Board view"></div>
+
+  <p class="footnote">Saved automatically in this browser · press <kbd>?</kbd> for shortcuts</p>
+
+</div>
+  </div>
+</div>
+
+<!-- ===================== TOAST REGION ===================== -->
+<div id="toast-region" class="toast-region" aria-live="polite"></div>
+
+<!-- ===================== SHORTCUTS MODAL ===================== -->
+<div id="shortcuts-backdrop" class="modal-backdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title" tabindex="-1">
+    <h2 id="shortcuts-title">Keyboard shortcuts</h2>
+    <div class="shortcut-row"><span>Command palette</span><kbd>⌘ / Ctrl K</kbd></div>
+    <div class="shortcut-row"><span>Focus quick add</span><kbd>N</kbd></div>
+    <div class="shortcut-row"><span>Add task</span><kbd>Enter</kbd></div>
+    <div class="shortcut-row"><span>Set effort while typing</span><kbd>! · !! · !!!</kbd></div>
+    <div class="shortcut-row"><span>Due date while typing</span><kbd>@today · @fri · @in3d</kbd></div>
+    <div class="shortcut-row"><span>Tag while typing</span><kbd>#tag</kbd></div>
+    <div class="shortcut-row"><span>Repeat while typing</span><kbd>*daily · *weekly</kbd></div>
+    <div class="shortcut-row"><span>Priority while typing</span><kbd>^1 · ^2 · ^3 · ^4</kbd></div>
+    <div class="shortcut-row"><span>Focus search</span><kbd>/</kbd></div>
+    <div class="shortcut-row"><span>Enter / exit Focus Mode</span><kbd>F</kbd></div>
+    <div class="shortcut-row"><span>Activity statement</span><kbd>S</kbd></div>
+    <div class="shortcut-row"><span>Toggle list / board view</span><kbd>B</kbd></div>
+    <div class="shortcut-row"><span>Select multiple tasks</span><kbd>X</kbd></div>
+    <div class="shortcut-row"><span>Show All / Active / Done</span><kbd>1 / 2 / 3</kbd></div>
+    <div class="shortcut-row"><span>Toggle night · paper</span><kbd>T</kbd></div>
+    <div class="shortcut-row"><span>Undo last delete</span><kbd>⌘ / Ctrl Z</kbd></div>
+    <div class="shortcut-row"><span>Close this panel</span><kbd>Esc</kbd></div>
+  </div>
+</div>
+
+<!-- ===================== COMMAND PALETTE ===================== -->
+<div id="palette-backdrop" class="palette-backdrop">
+  <div class="palette" role="dialog" aria-modal="true" aria-label="Command palette">
+    <div class="palette-input-row">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <input id="palette-input" class="palette-input" type="text" placeholder="Type a command…" autocomplete="off" />
+    </div>
+    <ul id="palette-list" class="palette-list"></ul>
+  </div>
+</div>
+
+<!-- ===================== FOCUS MODE ===================== -->
+<div id="focus-overlay" class="focus-overlay">
+  <button id="focus-exit" class="focus-exit" type="button" aria-label="Exit Focus Mode">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+
+  <div class="focus-inner">
+    <p class="focus-kicker mono">FOCUS MODE</p>
+
+    <div id="focus-card" class="focus-card">
+      <span id="focus-effort" class="effort-dot effort-med"></span>
+      <p id="focus-text" class="focus-text"></p>
+
+      <div class="focus-ring-wrap">
+        <svg width="128" height="128" viewBox="0 0 128 128" class="focus-ring">
+          <circle class="focus-ring-track" cx="64" cy="64" r="54"></circle>
+          <circle id="focus-ring-fill" class="focus-ring-fill" cx="64" cy="64" r="54" stroke-dasharray="339.3" stroke-dashoffset="339.3"></circle>
+        </svg>
+        <span id="focus-timer-label" class="focus-timer-label mono">25:00</span>
+      </div>
+
+      <button id="focus-timer-btn" class="focus-timer-btn" type="button">Start focus timer</button>
+
+      <div class="focus-actions">
+        <button id="focus-skip" class="focus-skip-btn" type="button">Skip for now</button>
+        <button id="focus-done" class="focus-done-btn" type="button">Mark done</button>
+      </div>
+    </div>
+
+    <div id="focus-empty" class="focus-empty">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <p>Everything's done.</p>
+      <p class="focus-empty-sub">Nothing left to focus on right now.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== ACTIVITY STATEMENT ===================== -->
+<div id="statement-backdrop" class="modal-backdrop">
+  <div class="modal statement-modal" role="dialog" aria-modal="true" aria-labelledby="statement-title" tabindex="-1">
+    <div class="statement-head">
+      <div>
+        <p class="statement-kicker mono">STATEMENT OF ACCOUNT</p>
+        <h2 id="statement-title">Last 7 days</h2>
+      </div>
+      <button id="statement-close" class="icon-btn" type="button" aria-label="Close statement">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <!-- chart controls: range + chart type, fully editable -->
+    <div class="chart-controls">
+      <div id="chart-range" class="chip-group" role="tablist" aria-label="Chart range">
+        <button class="chip" type="button" data-range="7" role="tab" aria-selected="true">7D</button>
+        <button class="chip" type="button" data-range="14" role="tab" aria-selected="false">14D</button>
+        <button class="chip" type="button" data-range="30" role="tab" aria-selected="false">30D</button>
+        <button class="chip" type="button" data-range="84" role="tab" aria-selected="false">12W</button>
+      </div>
+      <div id="chart-type" class="chip-group chip-group--icons" role="tablist" aria-label="Chart type">
+        <button class="chip chip--icon active" type="button" data-type="bar" role="tab" aria-selected="true" aria-label="Bar chart" title="Bar chart">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 21V11M12 21V4M19 21v-7" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg>
+        </button>
+        <button class="chip chip--icon" type="button" data-type="line" role="tab" aria-selected="false" aria-label="Line chart" title="Line chart">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M4 17l5-6 4 3 7-9" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="chip-group chip-group--metric" role="tablist" aria-label="Chart metric">
+        <button class="chip" type="button" data-metric="effort" role="tab" aria-selected="true">Effort</button>
+        <button class="chip" type="button" data-metric="count" role="tab" aria-selected="false">Entries</button>
+      </div>
+    </div>
+
+    <svg id="statement-chart" class="statement-chart" viewBox="0 0 280 92" preserveAspectRatio="none" aria-hidden="true"></svg>
+    <div id="statement-day-labels" class="statement-day-labels mono"></div>
+
+    <p class="statement-subhead mono">10-WEEK LEDGER</p>
+    <div id="statement-heatmap" class="statement-heatmap" aria-label="10 week completion heatmap"></div>
+
+    <dl class="statement-figures">
+      <div class="statement-figure">
+        <dt id="stmt-count-label">Entries (7d)</dt>
+        <dd id="stmt-week-count" class="mono">0</dd>
+      </div>
+      <div class="statement-figure">
+        <dt id="stmt-effort-label">Effort (7d)</dt>
+        <dd id="stmt-week-effort" class="mono">0</dd>
+      </div>
+      <div class="statement-figure">
+        <dt>Current streak</dt>
+        <dd id="stmt-streak" class="mono">0</dd>
+      </div>
+      <div class="statement-figure">
+        <dt>Best streak</dt>
+        <dd id="stmt-best-streak" class="mono">0</dd>
+      </div>
+    </dl>
+
+    <div id="statement-tags-row" class="statement-tags-row">
+      <p class="statement-subhead mono">MOST-LOGGED TAGS</p>
+      <div id="statement-tags" class="statement-tags"></div>
+    </div>
+
+    <div class="statement-rhythm-row">
+      <p class="statement-subhead mono">YOUR RHYTHM — WHEN THINGS GET DONE</p>
+      <div id="statement-rhythm" class="statement-rhythm" aria-label="Completions by time of day"></div>
+      <p id="stmt-rhythm-note" class="statement-rhythm-note"></p>
+    </div>
+
+    <p class="statement-footline mono">Balanced by <span id="stmt-total">0</span> entries settled all-time.</p>
+  </div>
+</div>
+
+<script src="js/utils.js"></script>
+<script src="js/store.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/toast.js"></script>
+<script src="js/dragdrop.js"></script>
+<script src="js/gestures.js"></script>
+<script src="js/shortcuts.js"></script>
+<script src="js/palette.js"></script>
+<script src="js/render.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
