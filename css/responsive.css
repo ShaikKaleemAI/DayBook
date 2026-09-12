@@ -1,0 +1,100 @@
+/* ==========================================================================
+   RESPONSIVE — small screens shrink, larger screens get real breathing
+   room instead of a narrow column stranded in a sea of empty page. Every
+   rule below is additive/overriding on top of the mobile-first base
+   styles in the other files.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- mobile */
+
+@media (max-width: 560px){
+  .header-stats .stat-block.stat-streak span:last-child{ display: none; }
+}
+
+@media (max-width: 480px){
+  .page{ padding: 40px 14px 48px; gap: 18px; }
+  .brand h1{ font-size: 21px; }
+  .app-header{ top: 8px; }
+  .ledger-footer{ justify-content: center; }
+  .count-label{ order: 3; width: 100%; text-align: center; }
+  .entry-kbd-hint{ display: none; }
+  .chart-controls{ gap: 6px; }
+  .chip-group--metric{ margin-left: 0; }
+}
+
+@media (max-width: 360px){
+  .header-stats{ gap: var(--sp-2); }
+  .stat-block.stat-streak{ display: none; }
+}
+
+/* ------------------------------------------------------- 561–767: phone
+   landscape / small tablet. Nothing collapses here — just stop the
+   header actions and search bar from crowding each other. */
+@media (min-width: 561px) and (max-width: 767px){
+  .app-header{ flex-wrap: wrap; row-gap: var(--sp-2); }
+}
+
+/* -------------------------------------------------------------- tablet
+   ≥768px: the app stops being a "shrunk phone layout" and gets real
+   desktop proportions — wider card, bigger type, more generous padding,
+   so the ledger reads like a page instead of a strip pinned to the left
+   of empty space. */
+@media (min-width: 768px){
+  .page{
+    max-width: 700px;
+    padding: 64px 28px 72px;
+    gap: 26px;
+  }
+  .brand h1{ font-size: 28px; }
+  .ledger-card{ padding-left: 34px; }
+  .app-header{ top: 18px; }
+  .toolbar-row{ gap: var(--sp-3); }
+  .modal:not(.statement-modal){ width: min(80vw, 400px); }
+  .statement-modal{ width: min(80vw, 460px); padding: var(--sp-6) var(--sp-8) var(--sp-8); }
+  .palette{ width: min(80vw, 560px); }
+}
+
+/* ------------------------------------------------------------- desktop
+   ≥1024px: the primary breakpoint for "desktop mode". A mouse-driven,
+   wide viewport gets a noticeably roomier column, larger click targets
+   feel intentional rather than oversized, and interactive elements pick
+   up hover affordances that only make sense with a pointer. */
+@media (min-width: 1024px){
+  body{ padding: 0 24px; box-sizing: border-box; }
+  .page{
+    max-width: 760px;
+    padding: 72px 0 84px;
+    gap: 28px;
+  }
+  .ledger-card{ border-radius: calc(var(--r-lg) + 4px); }
+  .icon-btn:hover{ transform: translateY(-1px); }
+  .add-btn:hover{ transform: translateY(-1px) scale(1.04); }
+  .board-view{ max-width: 1180px; }
+
+  /* command palette and modals feel cramped at phone width even on a
+     big screen if left unstyled — give them real desktop sizing */
+  .palette{ width: min(70vw, 620px); margin-top: 8vh; }
+  .modal:not(.statement-modal){ width: min(60vw, 420px); }
+  .statement-modal{ width: min(64vw, 480px); }
+
+  /* board columns: use the extra width for a true multi-column kanban
+     instead of a horizontally-scrolling strip */
+  .board-view{ overflow-x: visible; grid-auto-columns: unset; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
+
+/* --------------------------------------------------------- large desktop
+   ≥1440px: cap growth with a slightly wider column and larger base
+   type so the page never feels like it's fighting a huge monitor, but
+   also never turns into an unreadable full-bleed line length. */
+@media (min-width: 1440px){
+  .page{ max-width: 860px; padding-top: 84px; }
+  .brand h1{ font-size: 30px; }
+  :root{ --text-base: 16px; }
+}
+
+/* Fine pointer devices only: hover polish that would otherwise leave a
+   "stuck" hover state on touch screens. */
+@media (hover: hover) and (pointer: fine){
+  .task-row:hover{ background: var(--surface-raised); }
+  .board-card:hover .board-card__text{ color: var(--text); }
+}

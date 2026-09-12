@@ -1,0 +1,88 @@
+/* ==========================================================================
+   ANIMATIONS — keyframes referenced by components.css
+   ========================================================================== */
+
+@keyframes rowEnter{
+  from{ opacity: 0; transform: translateY(-6px) scale(.98); }
+  to{ opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* page-load choreography */
+@keyframes pageIn{
+  from{ opacity: 0; transform: translateY(10px); }
+  to{ opacity: 1; transform: translateY(0); }
+}
+
+/* signature: the ink-stamp completion moment */
+@keyframes stampPress{
+  0%   { transform: scale(1) rotate(0deg); }
+  32%  { transform: scale(.8) rotate(-8deg); }
+  60%  { transform: scale(1.14) rotate(4deg); }
+  80%  { transform: scale(.96) rotate(-1deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+@keyframes ringRipple{
+  from{ transform: scale(.5); opacity: .5; }
+  to{ transform: scale(2.6); opacity: 0; }
+}
+@keyframes inkBloom{
+  from{ opacity: .55; transform: scale(.3); }
+  to{ opacity: 0; transform: scale(1.8); }
+}
+@keyframes rowExit{
+  from{ opacity: 1; max-height: 60px; }
+  to{ opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; margin: 0; transform: scale(.97); }
+}
+
+@keyframes shake{
+  0%,100%{ transform: translateX(0); }
+  20%{ transform: translateX(-6px); }
+  40%{ transform: translateX(5px); }
+  60%{ transform: translateX(-4px); }
+  80%{ transform: translateX(3px); }
+}
+
+@keyframes fadeIn{
+  from{ opacity: 0; }
+  to{ opacity: 1; }
+}
+
+@keyframes modalIn{
+  from{ opacity: 0; transform: translateY(8px) scale(.96); }
+  to{ opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes toastIn{
+  from{ opacity: 0; transform: translateY(10px) scale(.96); }
+  to{ opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes toastOut{
+  from{ opacity: 1; transform: translateY(0) scale(1); }
+  to{ opacity: 0; transform: translateY(6px) scale(.96); }
+}
+
+/* editable activity chart: bars grow up from the baseline, staggered */
+@keyframes barGrow{
+  from{ transform: scaleY(0); }
+  to{ transform: scaleY(1); }
+}
+/* the line/area draws in as a soft reveal rather than a hard cut */
+@keyframes chartFadeUp{
+  from{ opacity: 0; transform: translateY(4px); }
+  to{ opacity: 1; transform: translateY(0); }
+}
+@keyframes chipPop{
+  0%{ transform: scale(1); }
+  40%{ transform: scale(.92); }
+  100%{ transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .page > *{ animation: none !important; }
+}

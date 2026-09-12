@@ -1,0 +1,209 @@
+/* ==========================================================================
+   LAYOUT — page shell, header, card frame
+   ========================================================================== */
+
+/* Height comes from content, not a forced 100vh — a short list (1-2
+   tasks) no longer leaves a large dead zone below the card. The page
+   background itself still fills the full viewport (see body in
+   base.css), so short content simply sits near the top with its normal
+   bottom padding instead of being stranded above empty space. */
+.page{
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 56px 20px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  transition: max-width var(--dur-slow) var(--ease);
+}
+
+/* signature: the page opens like a ledger cover — a short, orchestrated
+   entrance instead of scattered pop-ins. Runs once; respects reduced motion. */
+.page > *{
+  animation: pageIn var(--dur-slow) var(--ease-out) both;
+}
+.page > .app-header{ animation-delay: .02s; }
+.page > .toolbar-row{ animation-delay: .07s; }
+.page > .tag-filters{ animation-delay: .09s; }
+.page > .load-row{ animation-delay: .11s; }
+.page > .ledger-card{ animation-delay: .15s; }
+.page > .footnote{ animation-delay: .26s; }
+
+/* ---- header ---- */
+
+.app-header{
+  position: sticky;
+  top: 14px;
+  z-index: var(--z-header);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: var(--sp-2) var(--sp-3) var(--sp-2) 12px;
+  /* solid backing so content scrolling underneath doesn't show through and
+     overlap the header text — this was the root cause of the header/
+     search-bar overlap while scrolling */
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  border-radius: var(--r-lg);
+  border: 1px solid transparent;
+  box-shadow: none;
+  transition: box-shadow var(--dur-base) var(--ease), border-color var(--dur-base) var(--ease), background-color var(--dur-slow) var(--ease);
+}
+/* once the page has actually scrolled, give the floating header a subtle
+   edge + shadow so it visibly separates from the content sliding beneath it */
+.app-header.is-scrolled{
+  border-color: var(--border-soft);
+  box-shadow: var(--shadow-md);
+}
+
+.brand{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand-mark{
+  display: inline-flex;
+  color: var(--accent);
+}
+.brand h1{
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 26px;
+  letter-spacing: 0.005em;
+  text-shadow: var(--title-shadow);
+  transition: text-shadow var(--dur-slow) var(--ease);
+}
+.header-date{
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+  margin-left: 2px;
+  padding-top: 5px;
+  display: none;
+}
+@media (min-width: 460px){
+  .header-date{ display: inline; }
+}
+
+.header-stats{
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+}
+
+.stat-block{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+.stat-block .stat-icon{ color: var(--accent); flex-shrink: 0; display:flex; }
+
+.header-actions{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon-btn{
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-full);
+  border: 1.5px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+.icon-btn:hover{
+  color: var(--text);
+  background: var(--surface-raised);
+  border-color: var(--border);
+}
+
+/* ---- ledger card ---- */
+
+.ledger-card{
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  padding-left: 30px;
+  overflow: hidden;
+  transition: background-color var(--dur-slow) var(--ease), border-color var(--dur-slow) var(--ease);
+}
+
+/* signature: a stitched book-spine along the left edge */
+.ledger-card::before{
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--border) 0,
+    var(--border) 6px,
+    transparent 6px,
+    transparent 16px
+  );
+  opacity: .8;
+}
+.ledger-card::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  left: 30px;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 47px,
+    var(--border-soft) 48px
+  );
+  opacity: .4;
+  mask-image: linear-gradient(to bottom, transparent 0, black 96px, black calc(100% - 70px), transparent 100%);
+}
+
+.ledger-card__inner{
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- footnote ---- */
+
+.footnote{
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+}
+.footnote kbd{
+  font-family: var(--font-mono);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 10.5px;
+}
+
+/* ---- toast region ---- */
+
+.toast-region{
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 8px;
+  width: min(92vw, 380px);
+  pointer-events: none;
+}
